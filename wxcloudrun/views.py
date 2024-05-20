@@ -64,3 +64,20 @@ def get_count():
     """
     counter = Counters.query.filter(Counters.id == 1).first()
     return make_succ_response(0) if counter is None else make_succ_response(counter.count)
+
+from werobot import WeRoBot
+
+robot = WeRoBot()#token='token')
+
+
+@robot.handler
+def hello(message):
+    return 'Hello World!'
+
+from werobot.contrib.flask import make_view
+
+#app = Flask(__name__)
+app.add_url_rule(rule='/robot/', # WeRoBot 的绑定地址
+                #endpoint='werobot', # Flask 的 endpoint
+                view_func=make_view(robot),
+                methods=['GET', 'POST'])
