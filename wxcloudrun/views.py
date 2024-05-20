@@ -67,10 +67,10 @@ def get_count():
 
 from werobot import WeRoBot
 
-robot = WeRoBot()#token='token')
+myrobot = WeRoBot()#token='token')
 
 
-@robot.handler
+@myrobot.handler
 def hello(message):
     return 'Hello World!'
 
@@ -78,6 +78,6 @@ from werobot.contrib.flask import make_view
 
 #app = Flask(__name__)
 app.add_url_rule(rule='/robot/', # WeRoBot 的绑定地址
-                endpoint='werobot', # Flask 的 endpoint
-                view_func=make_view(robot),
+                endpoint='werobot1', # Flask 的 endpoint
+                view_func=make_view(myrobot),
                 methods=['GET', 'POST'])
