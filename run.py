@@ -14,6 +14,7 @@ robot = werobot.WeRoBot(token='tokenhere')
 @robot.text
 def hello_world():
     return 'Hello World!'
-
-if __name__ == '__main__':
-    robot.run()
+robot.config['HOST'] = '0.0.0.0'
+robot.config['PORT'] = 80
+#if __name__ == '__main__':
+robot.run()
