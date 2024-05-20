@@ -88,4 +88,4 @@ def robot():
 
 @app.route('/robot/p', methods=['GET', 'POST'])
 def robot1():
-    return 'hello'
+    return make_succ_response('hello')
