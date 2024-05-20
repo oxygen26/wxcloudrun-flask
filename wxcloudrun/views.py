@@ -77,11 +77,11 @@ def hello(message):
 from werobot.contrib.flask import make_view
 
 from flask import Flask
-app = Flask(__name__)
-app.add_url_rule(rule='/robot/', # WeRoBot 的绑定地址
-                endpoint='werobot1', # Flask 的 endpoint
-                view_func=make_view(myrobot),
-                methods=['GET', 'POST'])
+#app = Flask(__name__)
+# app.add_url_rule(rule='/robot/', # WeRoBot 的绑定地址
+#                 endpoint='werobot1', # Flask 的 endpoint
+#                 view_func=make_view(myrobot),
+#                 methods=['GET', 'POST'])
 
 # @app.route('/robot/', methods=['GET', 'POST'])
 # def robotx():
