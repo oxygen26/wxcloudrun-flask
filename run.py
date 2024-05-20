@@ -1,7 +1,7 @@
 # 创建应用实例
 import sys
 
-from wxcloudrun import app
+#from wxcloudrun import app
 
 
 
@@ -17,5 +17,61 @@ from wxcloudrun import app
 
 
 # 启动Flask Web服务
+#if __name__ == '__main__':
+    #app.run(host=sys.argv[1], port=sys.argv[2])
+
+from flask import Flask,Blueprint
+from flask_restful import Api,Resource,reqparse
+from flask_cors import CORS
+from werobot.contrib.flask import make_view #使用make_view依赖到flask项目
+from robot import robot
+app=Flask(__name__)
+app.add_url_rule(rule='/api/app/',        # WeRoBot挂载地址
+                 endpoint='werobot',             # Flask的endpoint
+                 view_func=make_view(robot),#robot是robot文件
+                 methods=['GET', 'POST'])
+
+
+CORS(app)
+Appblue=Api(app)
+
+class Text(Resource):
+    def post(self):
+        resCode=200
+        resMsg='成功'
+        parse=reqparse.RequestParser()
+        parse.add_argument('name',type=str,required=True)
+        parse.add_argument('age',type=str,required=True)
+        args=parse.parse_args()
+        name=args['name']
+        age=args['age']
+        return [{'resCode':resCode,'resMsg':resMsg,'data':{'naem':name,'age':age}}]
+
+    def get(self):
+        return "<h1 style='color:blue'>Hello There!</h1>"
+
+Appblue.add_resource(Text,'/Text')
+
+class GetNewname(Resource):
+
+    def post(self):
+        resCode=200
+        resMsg='成功'
+        parse=reqparse.RequestParser()
+        parse.add_argument('name',type=str,help='请输入名字',required=True)
+        args=parse.parse_args()
+        name=args['name']
+        return {'resCode':resCode,'resMsg':resMsg,'data':{'name':name}}
+
+    def get(self):
+        resCode=200
+        resMsg='成功'
+        name='xxx'
+        return {'resCode':resCode,'resMsg':resMsg,'data':{'name':name}}
+
+Appblue.add_resource(GetNewname,'/api/GetNewname')
+
+
 if __name__ == '__main__':
-    app.run(host=sys.argv[1], port=sys.argv[2])
+    app.run(debug=True)
+
