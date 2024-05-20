@@ -86,6 +86,6 @@ from werobot.contrib.flask import make_view
 def robot():
     return make_view(myrobot)
 
-@app.route('/robot/1', methods=['GET', 'POST'])
+@app.route('/robot/p', methods=['GET', 'POST'])
 def robot1():
     return 'hello'
