@@ -92,7 +92,12 @@ def robot1():
     #params = request.get_json()
     #print(params)
     print('suc11')
-    return make_succ_response('hello')
+    return {
+  "ToUserName": "用户OPENID",
+  "FromUserName": "公众号/小程序原始ID",
+  "CreateTime": int(datetime.now().timestamp()), #// 整型，例如：1648014186
+  "MsgType": "text",
+  "Content": "文本消息"}
 
 
 import requests
