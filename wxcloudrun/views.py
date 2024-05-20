@@ -89,6 +89,8 @@ from flask import Flask
 
 @app.route('/robot/p1', methods=['GET', 'POST'])
 def robot1():
+    params = request.get_json()
+    print(params)
     return make_succ_response('hello')
 
 
@@ -105,4 +107,4 @@ def robot2():
                 "content": "abcd"
             }
         }
-        )
+        ).json()
