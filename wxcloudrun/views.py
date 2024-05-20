@@ -84,9 +84,25 @@ app.add_url_rule(rule='/robot/', # WeRoBot 的绑定地址
                 methods=['GET', 'POST'])
 
 # @app.route('/robot/', methods=['GET', 'POST'])
-# def robot():
+# def robotx():
 #     return make_view(myrobot)
 
-# @app.route('/robot/p', methods=['GET', 'POST'])
-# def robot1():
-#     return make_succ_response('hello')
+@app.route('/robot/p1', methods=['GET', 'POST'])
+def robot1():
+    return make_succ_response('hello')
+
+
+import requests
+
+@app.route('/robot/p', methods=['GET', 'POST'])
+def robot2():
+    return requests.post(
+            url="https://api.weixin.qq.com/cgi-bin/message/custom/send",
+            data= {
+            #"touser": user_id,
+            "msgtype": "text",
+            "text": {
+                "content": "abcd"
+            }
+        }
+        )
