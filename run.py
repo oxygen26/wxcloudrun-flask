@@ -180,7 +180,7 @@ def handle_xml_data(xml_data):
     return response_xml
 
 def generate_reply(to_user, from_user, content):
-    reply_xml = TextReply.TEMPLATE.format(to_user, from_user, int(time.time()), content)
+    reply_xml = TextReply.TEMPLATE.format(target=to_user, source=from_user, time=int(time.time()), content=content)
     return reply_xml
 
 if __name__ == '__main__':
