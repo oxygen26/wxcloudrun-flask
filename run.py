@@ -90,10 +90,11 @@ def generate_reply(to_user, from_user, content):
     """.format(to_user, from_user, int(time.time()), content)
     return reply_xml
 
-@app.route('/', methods=['GET', 'POST', 'PUT', 'DELETE'])
+@app.route('/wechat', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def handle_request():
     if request.method == 'POST':
         # 处理微信服务器推送的消息
+        app.logger.debug('新流程%s', request.data)
         xml_str = request.data
         xml = ET.fromstring(xml_str)
 
@@ -116,7 +117,7 @@ def handle_request():
         return response
 
 
-    elif request.method == 'POST':
+    elif 0:#request.method == 'POST':
         app.logger.debug('消息推送%s', request.json)
         
         # 从请求头中获取 'x-wx-from-appid' 字段的值，如果不存在则使用空字符串
@@ -157,10 +158,7 @@ def handle_request():
     # <Content><![CDATA[{content}]]></Content>
     # </xml>
     # """.format(source=FromUserName, target=ToUserName, time=CreateTime, content=Content)   
-            try:
-                return process_function_reply('something',message)#'success'
-            except:
-                return 'howmany'
+            return process_function_reply('something',message)#'success'
         else:
             return 'success'
     else:
