@@ -70,7 +70,7 @@ def handle_request():
         app.logger.debug('消息推送%s', request.json)
         
         # 从请求头中获取 'x-wx-from-appid' 字段的值，如果不存在则使用空字符串
-        app.logger.debug('%s',request.headers)
+        #app.logger.debug('%s',request.headers)
         appid = request.headers.get('X-Wx-Appid', '')#'wx20b1396d77813bab')
 
         # 从请求体中解构出 ToUserName, FromUserName, MsgType, Content, 和 CreateTime 字段
@@ -97,7 +97,15 @@ def handle_request():
                     sendmess(appid, mess)
                 except Exception as e:
                     app.logger.debug('%s',e)
-                
+            return """
+    <xml>
+    <ToUserName><![CDATA[{target}]]></ToUserName>
+    <FromUserName><![CDATA[{source}]]></FromUserName>
+    <CreateTime>{time}</CreateTime>
+    <MsgType><![CDATA[text]]></MsgType>
+    <Content><![CDATA[{content}]]></Content>
+    </xml>
+    """.format(source=FromUserName, target=ToUserName, time=CreateTime, content=Content)   
             return process_function_reply('something',message)#'success'
         else:
             return 'success'
