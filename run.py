@@ -106,6 +106,7 @@ def json_to_xml(json_data):
 @app.route('/wechat', methods=['POST'])
 def wechat():
     # 检查 Content-Type 是否为 application/json
+    app.logger.debug(request.content_type)
     if request.content_type == 'application/json':
         
         # 解析 JSON 数据
@@ -115,6 +116,7 @@ def wechat():
         # 将 JSON 数据转换为 XML
         xml_data = json_to_xml(json_data)
     elif request.content_type == 'application/xml':
+        app.logger.debug('xml==================================')
         xml_data = request.data
         
     else:
