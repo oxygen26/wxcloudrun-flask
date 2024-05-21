@@ -112,8 +112,11 @@ def handle_request():
             reply_content = '暂不支持此类型消息'
 
         response_xml = generate_reply(from_user, to_user, reply_content)
+        app.logger.debug('回复消息%s', response_xml)
         response = make_response(response_xml)
+        
         response.content_type = 'application/xml'
+        app.logger.debug('response对象%s',response.json())
         return response
 
 
