@@ -132,15 +132,15 @@ def handle_request():
             xml_str = ET.tostring(root, encoding='utf-8')
             xmls = ET.fromstring(xml_str)
 
-        try:
-            ToUserName = xmls.find('ToUserName').text
-            FromUserName = xmls.find('FromUserName').text
-            MsgType = xmls.find('MsgType').text
-            Content = xmls.find('Content').text if MsgType == 'text' else ''
+    
+        ToUserName = xmls.find('ToUserName').text if xmls.find('ToUserName') else ''
+        FromUserName = xmls.find('FromUserName').text if xmls.find('FromUserName') else ''
+        MsgType = xmls.find('MsgType').text if xmls.find('MsgType') else  ''
+        Content = xmls.find('Content').text if MsgType == 'text' else ''
 
-            app.logger.debug('Parsed XML - ToUserName: %s, FromUserName: %s, MsgType: %s, Content: %s', ToUserName, FromUserName, MsgType, Content)
-        except:
-            pass
+        app.logger.debug('Parsed XML - ToUserName: %s, FromUserName: %s, MsgType: %s, Content: %s', ToUserName, FromUserName, MsgType, Content)
+        
+        
         if MsgType == 'text':
             if Content == '回复文字':
                 reply_content = '这是回复的消息'
