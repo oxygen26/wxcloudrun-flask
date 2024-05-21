@@ -157,7 +157,7 @@ except Exception as e:
     except Exception as e:
         print('simple engine error::',e)
 
-def chat(messages):
+def chat(messages): 
     response_text = {'result':chat_engine.chat(
             messages#custom_chat_history[-1].content
             ).response,"usage":{"total_tokens":2,"completion_tokens":1}}
