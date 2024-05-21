@@ -27,7 +27,7 @@ from flask import Flask, request, make_response
 
 import hashlib
 import xml.etree.ElementTree as ET
-from werobot.replies import process_function_reply
+from werobot.replies import * #process_function_reply
 from werobot.messages.messages import MessageMetaClass, UnknownMessage
 from werobot.messages.events import EventMetaClass, UnknownEvent
 
@@ -78,148 +78,111 @@ def check_signature(token, signature, timestamp, nonce):
 
 def generate_reply(to_user, from_user, content):
     # 生成回复消息的 XML 格式
-    reply_xml = """
-    <xml>
-      <ToUserName><![CDATA[{0}]]></ToUserName>
-      <FromUserName><![CDATA[{1}]]></FromUserName>
-      <CreateTime>{2}</CreateTime>
-      <MsgType><![CDATA[text]]></MsgType>
-      <Content><![CDATA[{3}]]></Content>
-    </xml>
-    """.format(to_user, from_user, int(time.time()), content)
+    TextReply.TEMPLATE.format(to_user, from_user, int(time.time()), content)
     return reply_xml
 
-@app.route('/wechat', methods=['GET', 'POST', 'PUT', 'DELETE'])
-def handle_request():
-    if request.method == 'POST':
-        # app.logger.debug('消息推送:%s', request.json)
-        
-        # # 从请求头中获取 'x-wx-from-appid' 字段的值，如果不存在则使用空字符串
-        # #app.logger.debug('请求头%s',request.headers)
-        # appid = request.headers.get('X-Wx-Appid', '')#'wx20b1396d77813bab')
-        # app.logger.debug('appid:%s',appid)
-
-        # # 从请求体中解构出 ToUserName, FromUserName, MsgType, Content, 和 CreateTime 字段
-        # data = request.json
-        # #message = process_message(data)
-        # ToUserName = data.get('ToUserName', '')
-        # FromUserName = data.get('FromUserName', '')
-        # MsgType = data.get('MsgType', '')
-        # Content = data.get('Content', '')
-        # CreateTime = data.get('CreateTime', '')
-
-        # app.logger.debug('推送接收的账号:%s %s', ToUserName, CreateTime)
-        
-        json_str = request.data
-        app.logger.debug('Received POST request with data: %s', json_str)
-        
-        import xml.etree.ElementTree as ET
-        try:
-            xmls = ET.fromstring(json_str)
-        except Exception as e:
-            #import xml
-            import json
-            data = json.loads(json_str)
-
-            # 创建 XML 元素
-            root = ET.Element("xml")
-
+def json_to_xml(json_data):
+    # 创建 XML 根元素
+    root = ET.Element("xml")
+    
+    # 递归转换 JSON 数据为 XML 元素
+    def build_xml_element(parent, data):
+        if isinstance(data, dict):
             for key, value in data.items():
-                element = ET.SubElement(root, key)
-                element.text = str(value)
+                child = ET.SubElement(parent, key)
+                build_xml_element(child, value)
+        elif isinstance(data, list):
+            for item in data:
+                child = ET.SubElement(parent, "item")
+                build_xml_element(child, item)
+        else:
+            parent.text = str(data)
 
-            # 生成 XML 字符串
-            xml_str = ET.tostring(root, encoding='utf-8')
-            xmls = ET.fromstring(xml_str)
-            app.logger.debug('Received POST request with xml_str: %s', xml_str)
+    build_xml_element(root, json_data)
+    
+    # 生成 XML 字符串
+    xml_str = ET.tostring(root, encoding='utf-8')
+    return xml_str
+@app.route('/wechat', methods=['POST'])
+def wechat():
+    # 检查 Content-Type 是否为 application/json
+    if request.content_type == 'application/json':
+        try:
+            # 解析 JSON 数据
+            json_data = request.json
+            print('接收到的 JSON 数据:', json_data)
 
-        try:
-            ToUserName = xmls.find('ToUserName').text
-        except Exception as e:
-            ToUserName =  ''
-        try:
-            FromUserName = xmls.find('FromUserName').text
-        except Exception as e:
-            FromUserName = ''
-        try:
-            MsgType = xmls.find('MsgType').text
-        except Exception as e:
-            MsgType = ''
-        try:
-            Content = xmls.find('Content').text
-        except Exception as e:
-            Content = ''
+            # 将 JSON 数据转换为 XML
+            xml_data = json_to_xml(json_data)
+            print('转换后的 XML 数据:', xml_data.decode('utf-8'))
+
+            # 处理 XML 数据并生成响应
+            response_data = handle_xml_data(xml_data)
             
-        #FromUserName = xmls.find('FromUserName').text if xmls.find('FromUserName') else ''
-        #MsgType = xmls.find('MsgType').text if xmls.find('MsgType') else  ''
-        #Content = xmls.find('Content').text if MsgType == 'text' else ''
-
-        app.logger.debug('Parsed XML - ToUserName: %s, FromUserName: %s, MsgType: %s, Content: %s', ToUserName, FromUserName, MsgType, Content)
-        
-        
-        if MsgType == 'text':
-            if Content == '回复文字':
-                reply_content = '这是回复的消息'
-            else:
-                reply_content = '收到你的消息：' + Content
-        else:
-            reply_content = '暂不支持此类型消息'
-
-        response_xml = generate_reply(FromUserName, ToUserName, reply_content)
-        app.logger.debug('回复消息：%s', response_xml)
-        response = make_response(response_xml)
-        
-        response.content_type = 'application/xml'
-        #app.logger.debug('response对象%s',response.json())
-        return response
-
-
-    elif 0:#request.method == 'POST':
-        app.logger.debug('消息推送%s', request.json)
-        
-        # 从请求头中获取 'x-wx-from-appid' 字段的值，如果不存在则使用空字符串
-        #app.logger.debug('请求头%s',request.headers)
-        appid = request.headers.get('X-Wx-Appid', '')#'wx20b1396d77813bab')
-        app.logger.debug('appid%s',appid)
-
-        # 从请求体中解构出 ToUserName, FromUserName, MsgType, Content, 和 CreateTime 字段
-        data = request.json
-        message = process_message(data)
-        ToUserName = data.get('ToUserName', '')
-        FromUserName = data.get('FromUserName', '')
-        MsgType = data.get('MsgType', '')
-        Content = data.get('Content', '')
-        CreateTime = data.get('CreateTime', '')
-
-        app.logger.debug('推送接收的账号%s %s', ToUserName, CreateTime)
-        
-        if 1 :#MsgType == 'text':
-            if 1:#Content == '回复文字':  # 小程序、公众号可用
-                mess = {
-                    'touser': FromUserName,
-                    'msgtype': 'text',
-                    'text': {
-                        'content': '这是回复的消息'
-                    }
-                }
-                try:
-                    sendmess(appid, mess)
-                except Exception as e:
-                    app.logger.debug('发送错误%s',e)
-    #         return """
-    # <xml>
-    # <ToUserName><![CDATA[{target}]]></ToUserName>
-    # <FromUserName><![CDATA[{source}]]></FromUserName>
-    # <CreateTime>{time}</CreateTime>
-    # <MsgType><![CDATA[text]]></MsgType>
-    # <Content><![CDATA[{content}]]></Content>
-    # </xml>
-    # """.format(source=FromUserName, target=ToUserName, time=CreateTime, content=Content)   
-            return process_function_reply('something',message)#'success'
-        else:
-            return 'success'
+            response = make_response(response_data)
+            response.content_type = 'application/xml'
+            return response
+        except json.JSONDecodeError as e:
+            return f'JSON 解析错误: {e}', 400
     else:
-        return '仅支持 POST 请求'
+        return 'Content-Type 必须为 application/json', 400
+
+def json_to_xml(json_data):
+    # 创建 XML 根元素
+    root = ET.Element("xml")
+    
+    # 递归转换 JSON 数据为 XML 元素
+    def build_xml_element(parent, data):
+        if isinstance(data, dict):
+            for key, value in data.items():
+                child = ET.SubElement(parent, key)
+                build_xml_element(child, value)
+        elif isinstance(data, list):
+            for item in data:
+                child = ET.SubElement(parent, "item")
+                build_xml_element(child, item)
+        else:
+            parent.text = str(data)
+
+    build_xml_element(root, json_data)
+    
+    # 生成 XML 字符串
+    xml_str = ET.tostring(root, encoding='utf-8')
+    return xml_str
+
+def handle_xml_data(xml_data):
+    # 解析 XML 数据并生成响应
+    try:
+        xml = ET.fromstring(xml_data)
+
+        to_user = xml.find('ToUserName').text
+        from_user = xml.find('FromUserName').text
+        msg_type = xml.find('MsgType').text
+        content = xml.find('Content').text if msg_type == 'text' else ''
+
+        print(f'ToUserName: {to_user}')
+        print(f'FromUserName: {from_user}')
+        print(f'MsgType: {msg_type}')
+        print(f'Content: {content}')
+
+        reply_content = '这是回复的消息' if content == '回复文字' else f'收到你的消息：{content}'
+        response_xml = generate_reply(from_user, to_user, reply_content)
+        
+        return response_xml
+    except ET.ParseError as e:
+        return f'XML 解析错误: {e}', 400
+
+def generate_reply(to_user, from_user, content):
+    reply_xml = f"""
+    <xml>
+      <ToUserName><![CDATA[{to_user}]]></ToUserName>
+      <FromUserName><![CDATA[{from_user}]]></FromUserName>
+      <CreateTime>{int(time.time())}</CreateTime>
+      <MsgType><![CDATA[text]]></MsgType>
+      <Content><![CDATA[{content}]]></Content>
+    </xml>
+    """
+    return reply_xml
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80,debug=True)
