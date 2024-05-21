@@ -117,9 +117,9 @@ def wechat():
             xml_data = json_to_xml(json_data)
         except Exception as e:
             app.logger.debug('解析 JSON 数据失败:%s', e)
-            #request.content_type == 'application/xml':
-            #app.logger.debug('xml==================================')
             xml_data = request.data
+    elif request.content_type == 'application/xml':
+        xml_data = request.data
     else:
         return 'Content-Type 必须为 application/json', 400
     app.logger.debug('转换后的 XML 数据:%s', xml_data.decode('utf-8'))
