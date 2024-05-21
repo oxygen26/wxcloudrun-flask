@@ -49,6 +49,7 @@ def handle_request():
         app.logger.debug('消息推送%s', request.json)
         
         # 从请求头中获取 'x-wx-from-appid' 字段的值，如果不存在则使用空字符串
+        app.logger.debug('%s',request.headers)
         appid = request.headers.get('x-wx-from-appid', 'wx20b1396d77813bab')
 
         # 从请求体中解构出 ToUserName, FromUserName, MsgType, Content, 和 CreateTime 字段
