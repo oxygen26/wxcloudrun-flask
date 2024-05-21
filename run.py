@@ -139,13 +139,14 @@ def handle_request():
 
         app.logger.debug('Parsed XML - ToUserName: %s, FromUserName: %s, MsgType: %s, Content: %s', ToUserName, FromUserName, MsgType, Content)
 
-        if 1:#MsgType == 'text':
+        if MsgType == 'text':
             if Content == '回复文字':
                 reply_content = '这是回复的消息'
             else:
                 reply_content = '收到你的消息：' + Content
         else:
             reply_content = '暂不支持此类型消息'
+            return 'success'
 
         response_xml = generate_reply(FromUserName, ToUserName, reply_content)
         app.logger.debug('回复消息：%s', response_xml)
