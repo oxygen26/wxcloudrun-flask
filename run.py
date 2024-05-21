@@ -107,27 +107,27 @@ def json_to_xml(json_data):
 def wechat():
     # 检查 Content-Type 是否为 application/json
     if request.content_type == 'application/json':
-        try:
-            # 解析 JSON 数据
-            json_data = request.json
-            app.logger.debug('接收到的 JSON 数据:%s', json_data)
+        
+        # 解析 JSON 数据
+        json_data = request.json
+        app.logger.debug('接收到的 JSON 数据:%s', json_data)
 
-            # 将 JSON 数据转换为 XML
-            xml_data = json_to_xml(json_data)
-            app.logger.debug('转换后的 XML 数据:%s', xml_data.decode('utf-8'))
-
-            # 处理 XML 数据并生成响应
-            response_data = handle_xml_data(xml_data)
-            app.logger.debug('生成的响应数据:%s', response_data)
-            response = make_response(response_data)
-            response.content_type = 'application/xml'
-            return response
-        except Exception as e :
-            app.logger.debug('处理 XML 数据出错:%s', e)#json.JSONDecodeError as e:
-            return f'JSON 解析错误: {e}', 400
+        # 将 JSON 数据转换为 XML
+        xml_data = json_to_xml(json_data)
+    elif request.content_type == 'application/xml':
+        xml_data = request.data
+        
     else:
         return 'Content-Type 必须为 application/json', 400
+    app.logger.debug('转换后的 XML 数据:%s', xml_data.decode('utf-8'))
 
+    # 处理 XML 数据并生成响应
+    response_data = handle_xml_data(xml_data)
+    app.logger.debug('生成的响应数据:%s', response_data)
+    response = make_response(response_data)
+    response.content_type = 'application/xml'
+    return response
+    
 def json_to_xml(json_data):
     # 创建 XML 根元素
     root = ET.Element("xml")
