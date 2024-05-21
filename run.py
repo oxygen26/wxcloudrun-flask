@@ -98,15 +98,15 @@ def handle_request():
                     sendmess(appid, mess)
                 except Exception as e:
                     app.logger.debug('发送错误%s',e)
-            return """
-    <xml>
-    <ToUserName><![CDATA[{target}]]></ToUserName>
-    <FromUserName><![CDATA[{source}]]></FromUserName>
-    <CreateTime>{time}</CreateTime>
-    <MsgType><![CDATA[text]]></MsgType>
-    <Content><![CDATA[{content}]]></Content>
-    </xml>
-    """.format(source=FromUserName, target=ToUserName, time=CreateTime, content=Content)   
+    #         return """
+    # <xml>
+    # <ToUserName><![CDATA[{target}]]></ToUserName>
+    # <FromUserName><![CDATA[{source}]]></FromUserName>
+    # <CreateTime>{time}</CreateTime>
+    # <MsgType><![CDATA[text]]></MsgType>
+    # <Content><![CDATA[{content}]]></Content>
+    # </xml>
+    # """.format(source=FromUserName, target=ToUserName, time=CreateTime, content=Content)   
             return process_function_reply('something',message)#'success'
         else:
             return 'success'
