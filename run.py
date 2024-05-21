@@ -110,15 +110,29 @@ def handle_request():
 
         # app.logger.debug('推送接收的账号:%s %s', ToUserName, CreateTime)
         
-        xml_str = request.data
-        app.logger.debug('Received POST request with data: %s', xml_str)
+        json_str = request.data
+        app.logger.debug('Received POST request with data: %s', json_str)
         
-        xml = ET.fromstring(xml_str)
+        import xml.etree.ElementTree as ET
+        import xml
+        import json
+        data = json.loads(json_str)
 
-        ToUserName = xml.find('ToUserName').text
-        FromUserName = xml.find('FromUserName').text
-        MsgType = xml.find('MsgType').text
-        Content = xml.find('Content').text if MsgType == 'text' else ''
+        # 创建 XML 元素
+        root = ET.Element("xml")
+
+        for key, value in data.items():
+            element = ET.SubElement(root, key)
+            element.text = str(value)
+
+        # 生成 XML 字符串
+        xml_str = ET.tostring(root, encoding='utf-8')
+        xmls = ET.fromstring(xml_str)
+
+        ToUserName = xmls.find('ToUserName').text
+        FromUserName = xmls.find('FromUserName').text
+        MsgType = xmls.find('MsgType').text
+        Content = xmls.find('Content').text if MsgType == 'text' else ''
 
         app.logger.debug('Parsed XML - ToUserName: %s, FromUserName: %s, MsgType: %s, Content: %s', ToUserName, FromUserName, MsgType, Content)
 
