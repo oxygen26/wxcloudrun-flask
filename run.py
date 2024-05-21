@@ -108,17 +108,18 @@ def wechat():
     # 检查 Content-Type 是否为 application/json
     app.logger.debug(request.content_type)
     if request.content_type == 'application/json':
-        
-        # 解析 JSON 数据
-        json_data = request.json
-        app.logger.debug('接收到的 JSON 数据:%s', json_data)
+        try:
+            # 解析 JSON 数据
+            json_data = request.json
+            app.logger.debug('接收到的 JSON 数据:%s', json_data)
 
-        # 将 JSON 数据转换为 XML
-        xml_data = json_to_xml(json_data)
-    elif request.content_type == 'application/xml':
-        app.logger.debug('xml==================================')
-        xml_data = request.data
-        
+            # 将 JSON 数据转换为 XML
+            xml_data = json_to_xml(json_data)
+        except Exception as e:
+            app.logger.debug('解析 JSON 数据失败:%s', e)
+            #request.content_type == 'application/xml':
+            #app.logger.debug('xml==================================')
+            xml_data = request.data
     else:
         return 'Content-Type 必须为 application/json', 400
     app.logger.debug('转换后的 XML 数据:%s', xml_data.decode('utf-8'))
