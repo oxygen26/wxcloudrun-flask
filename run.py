@@ -131,6 +131,7 @@ def handle_request():
             # 生成 XML 字符串
             xml_str = ET.tostring(root, encoding='utf-8')
             xmls = ET.fromstring(xml_str)
+            app.logger.debug('Received POST request with xml_str: %s', xml_str)
 
     
         ToUserName = xmls.find('ToUserName').text if xmls.find('ToUserName') else ''
