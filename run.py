@@ -122,7 +122,8 @@ def wechat():
             response = make_response(response_data)
             response.content_type = 'application/xml'
             return response
-        except json.JSONDecodeError as e:
+        except Exception as e :
+            app.logger.debug('处理 XML 数据出错:%s', e)#json.JSONDecodeError as e:
             return f'JSON 解析错误: {e}', 400
     else:
         return 'Content-Type 必须为 application/json', 400
