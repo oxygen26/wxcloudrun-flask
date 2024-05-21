@@ -114,20 +114,23 @@ def handle_request():
         app.logger.debug('Received POST request with data: %s', json_str)
         
         import xml.etree.ElementTree as ET
-        import xml
-        import json
-        data = json.loads(json_str)
+        try:
+            xmls = ET.fromstring(xml_str)
+        except Exception as e:
+            #import xml
+            import json
+            data = json.loads(json_str)
 
-        # 创建 XML 元素
-        root = ET.Element("xml")
+            # 创建 XML 元素
+            root = ET.Element("xml")
 
-        for key, value in data.items():
-            element = ET.SubElement(root, key)
-            element.text = str(value)
+            for key, value in data.items():
+                element = ET.SubElement(root, key)
+                element.text = str(value)
 
-        # 生成 XML 字符串
-        xml_str = ET.tostring(root, encoding='utf-8')
-        xmls = ET.fromstring(xml_str)
+            # 生成 XML 字符串
+            xml_str = ET.tostring(root, encoding='utf-8')
+            xmls = ET.fromstring(xml_str)
 
         ToUserName = xmls.find('ToUserName').text
         FromUserName = xmls.find('FromUserName').text
