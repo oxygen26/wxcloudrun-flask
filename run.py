@@ -114,7 +114,7 @@ def handle_request():
             if Content == '回复文字':
                 reply_content = '这是回复的消息'
             else:
-                reply_content = '收到你的消息：' + content
+                reply_content = '收到你的消息：' + Content
         else:
             reply_content = '暂不支持此类型消息'
 
