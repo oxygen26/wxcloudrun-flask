@@ -31,7 +31,7 @@ app = Flask(__name__)
 def sendmess(appid, mess):
     try:
         response = requests.post(
-            f'http://api.weixin.qq.com/cgi-bin/message/custom/send', # ?from_appid={appid}'
+            f'http://api.weixin.qq.com/cgi-bin/message/custom/send?from_appid={appid}',
             
             data=json.dumps(mess),
             headers={'Content-Type': 'application/json'}
@@ -49,7 +49,7 @@ def handle_request():
         app.logger.debug('消息推送%s', request.json)
         
         # 从请求头中获取 'x-wx-from-appid' 字段的值，如果不存在则使用空字符串
-        appid = request.headers.get('x-wx-from-appid', '')
+        appid = request.headers.get('x-wx-from-appid', 'wx20b1396d77813bab')
 
         # 从请求体中解构出 ToUserName, FromUserName, MsgType, Content, 和 CreateTime 字段
         data = request.json
