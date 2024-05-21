@@ -123,7 +123,7 @@ def handle_request():
         response = make_response(response_xml)
         
         response.content_type = 'application/xml'
-        app.logger.debug('response对象%s',response.json())
+        #app.logger.debug('response对象%s',response.json())
         return response
 
 
