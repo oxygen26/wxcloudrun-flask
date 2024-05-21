@@ -107,7 +107,10 @@ def handle_request():
     # <Content><![CDATA[{content}]]></Content>
     # </xml>
     # """.format(source=FromUserName, target=ToUserName, time=CreateTime, content=Content)   
-            return process_function_reply('something',message)#'success'
+            try:
+                return process_function_reply('something',message)#'success'
+            except:
+                return 'howmany'
         else:
             return 'success'
     else:
