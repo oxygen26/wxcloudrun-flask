@@ -133,16 +133,31 @@ def handle_request():
             xmls = ET.fromstring(xml_str)
             app.logger.debug('Received POST request with xml_str: %s', xml_str)
 
-    
-        ToUserName = xmls.find('ToUserName').text if xmls.find('ToUserName') else ''
-        FromUserName = xmls.find('FromUserName').text if xmls.find('FromUserName') else ''
-        MsgType = xmls.find('MsgType').text if xmls.find('MsgType') else  ''
-        Content = xmls.find('Content').text if MsgType == 'text' else ''
+        try:
+            ToUserName = xmls.find('ToUserName').text
+        except Exception as e:
+            ToUserName =  ''
+        try:
+            FromUserName = xmls.find('FromUserName').text
+        except Exception as e:
+            FromUserName = ''
+        try:
+            MsgType = xmls.find('MsgType').text
+        except Exception as e:
+            MsgType = ''
+        try:
+            Content = xmls.find('Content').text
+        except Exception as e:
+            Content = ''
+            
+        #FromUserName = xmls.find('FromUserName').text if xmls.find('FromUserName') else ''
+        #MsgType = xmls.find('MsgType').text if xmls.find('MsgType') else  ''
+        #Content = xmls.find('Content').text if MsgType == 'text' else ''
 
         app.logger.debug('Parsed XML - ToUserName: %s, FromUserName: %s, MsgType: %s, Content: %s', ToUserName, FromUserName, MsgType, Content)
         
         
-        if 1:#MsgType == 'text':
+        if MsgType == 'text':
             if Content == '回复文字':
                 reply_content = '这是回复的消息'
             else:
