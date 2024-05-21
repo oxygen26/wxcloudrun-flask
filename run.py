@@ -23,6 +23,8 @@ import sys
 from flask import Flask, request, jsonify
 import requests
 import json
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
 
@@ -34,16 +36,16 @@ def sendmess(appid, mess):
             headers={'Content-Type': 'application/json'}
         )
         response.raise_for_status()
-        print('接口返回内容', response.text)
+        app.logger.debug('接口返回内容', response.text)
         return response.text
     except requests.RequestException as e:
-        print('接口返回错误', e)
+        app.logger.debug('接口返回错误', e)
         return str(e)
 
 @app.route('/', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def handle_request():
     if request.method == 'POST':
-        print('消息推送', request.json)
+        app.logger.debug('消息推送', request.json)
         
         # 从请求头中获取 'x-wx-from-appid' 字段的值，如果不存在则使用空字符串
         appid = request.headers.get('x-wx-from-appid', '')
@@ -56,7 +58,7 @@ def handle_request():
         Content = data.get('Content', '')
         CreateTime = data.get('CreateTime', '')
 
-        print('推送接收的账号', ToUserName, '创建时间', CreateTime)
+        app.logger.debug('推送接收的账号', ToUserName, '创建时间', CreateTime)
         
         if MsgType == 'text':
             if Content == '回复文字':  # 小程序、公众号可用
