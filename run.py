@@ -24,6 +24,10 @@ from flask import Flask, request, jsonify
 import requests
 import json
 
+from flask import Flask, request, make_response
+import hashlib
+import xml.etree.ElementTree as ET
+
 from werobot.replies import process_function_reply
 from werobot.messages.messages import MessageMetaClass, UnknownMessage
 from werobot.messages.events import EventMetaClass, UnknownEvent
@@ -64,9 +68,55 @@ def sendmess(appid, mess):
         app.logger.debug('接口返回错误%s', e)
         return str(e)
 
+def check_signature(token, signature, timestamp, nonce):
+    # 按照微信公众平台的要求进行签名验证
+    lst = [token, timestamp, nonce]
+    lst.sort()
+    sha1 = hashlib.sha1()
+    sha1.update("".join(lst).encode('utf-8'))
+    hashcode = sha1.hexdigest()
+    return hashcode == signature
+
+def generate_reply(to_user, from_user, content):
+    # 生成回复消息的 XML 格式
+    reply_xml = """
+    <xml>
+      <ToUserName><![CDATA[{0}]]></ToUserName>
+      <FromUserName><![CDATA[{1}]]></FromUserName>
+      <CreateTime>{2}</CreateTime>
+      <MsgType><![CDATA[text]]></MsgType>
+      <Content><![CDATA[{3}]]></Content>
+    </xml>
+    """.format(to_user, from_user, int(time.time()), content)
+    return reply_xml
+
 @app.route('/', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def handle_request():
     if request.method == 'POST':
+        # 处理微信服务器推送的消息
+        xml_str = request.data
+        xml = ET.fromstring(xml_str)
+
+        to_user = xml.find('ToUserName').text
+        from_user = xml.find('FromUserName').text
+        msg_type = xml.find('MsgType').text
+        content = xml.find('Content').text if msg_type == 'text' else ''
+
+        if 1:#msg_type == 'text':
+            if content == '回复文字':
+                reply_content = '这是回复的消息'
+            else:
+                reply_content = '收到你的消息：' + content
+        else:
+            reply_content = '暂不支持此类型消息'
+
+        response_xml = generate_reply(from_user, to_user, reply_content)
+        response = make_response(response_xml)
+        response.content_type = 'application/xml'
+        return response
+
+
+    elif request.method == 'POST':
         app.logger.debug('消息推送%s', request.json)
         
         # 从请求头中获取 'x-wx-from-appid' 字段的值，如果不存在则使用空字符串
