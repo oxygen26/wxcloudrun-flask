@@ -23,9 +23,29 @@ import sys
 from flask import Flask, request, jsonify
 import requests
 import json
+
 from werobot.replies import process_function_reply
+from werobot.messages.messages import MessageMetaClass, UnknownMessage
+from werobot.messages.events import EventMetaClass, UnknownEvent
+
 import logging
 logging.basicConfig(level=logging.DEBUG)
+
+def process_message(message):
+    """
+    Process a message dict and return a Message Object
+    :param message: Message dict returned by `parse_xml` function
+    :return: Message Object
+    """
+    message["type"] = message.pop("MsgType").lower()
+    if message["type"] == 'event':
+        message["type"] = str(message.pop("Event")).lower() + '_event'
+        message_type = EventMetaClass.TYPES.get(message["type"], UnknownEvent)
+    else:
+        message_type = MessageMetaClass.TYPES.get(
+            message["type"], UnknownMessage
+        )
+    return message_type(message)
 
 app = Flask(__name__)
 
@@ -55,6 +75,7 @@ def handle_request():
 
         # 从请求体中解构出 ToUserName, FromUserName, MsgType, Content, 和 CreateTime 字段
         data = request.json
+        message = process_message(data)
         ToUserName = data.get('ToUserName', '')
         FromUserName = data.get('FromUserName', '')
         MsgType = data.get('MsgType', '')
@@ -77,7 +98,7 @@ def handle_request():
                 except Exception as e:
                     app.logger.debug('%s',e)
                 
-            return process_function_reply('something',data)#'success'
+            return process_function_reply('something',message)#'success'
         else:
             return 'success'
     else:
