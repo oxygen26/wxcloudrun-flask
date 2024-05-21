@@ -153,26 +153,33 @@ def json_to_xml(json_data):
 
 def handle_xml_data(xml_data):
     # 解析 XML 数据并生成响应
+    xml = ET.fromstring(xml_data)
+
     try:
-        xml = ET.fromstring(xml_data)
-
         to_user = xml.find('ToUserName').text
+    except:
+        to_user=''
+    try:
         from_user = xml.find('FromUserName').text
+    except:
+        from_user=''
+    try:
         msg_type = xml.find('MsgType').text
+    except:
+        msg_type=''
+    try:
         content = xml.find('Content').text if msg_type == 'text' else ''
+    except:
+        content=''
+    app.logger.debug(f'ToUserName: {to_user}')
+    app.logger.debug(f'FromUserName: {from_user}')
+    app.logger.debug(f'MsgType: {msg_type}')
+    app.logger.debug(f'Content: {content}')
 
-        app.logger.debug(f'ToUserName: {to_user}')
-        app.logger.debug(f'FromUserName: {from_user}')
-        app.logger.debug(f'MsgType: {msg_type}')
-        app.logger.debug(f'Content: {content}')
-
-        reply_content = '这是回复的消息' if content == '回复文字' else f'收到你的消息：{content}'
-        response_xml = generate_reply(from_user, to_user, reply_content)
-        
-        return response_xml
-    except Exception as e:
-        app.logger.debug('错误! %s',e)
-        return f'XML 解析错误: {e}', 400
+    reply_content = '这是回复的消息' if content == '回复文字' else f'收到你的消息：{content}'
+    response_xml = generate_reply(from_user, to_user, reply_content)
+    
+    return response_xml
 
 def generate_reply(to_user, from_user, content):
     reply_xml = f"""
