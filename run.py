@@ -93,17 +93,25 @@ def generate_reply(to_user, from_user, content):
 @app.route('/wechat', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def handle_request():
     if request.method == 'POST':
-        # 处理微信服务器推送的消息
-        app.logger.debug('新流程%s', request.data)
-        xml_str = request.data
-        xml = ET.fromstring(xml_str)
+        app.logger.debug('消息推送%s', request.json)
+        
+        # 从请求头中获取 'x-wx-from-appid' 字段的值，如果不存在则使用空字符串
+        #app.logger.debug('请求头%s',request.headers)
+        appid = request.headers.get('X-Wx-Appid', '')#'wx20b1396d77813bab')
+        app.logger.debug('appid%s',appid)
 
-        to_user = xml.find('ToUserName').text
-        from_user = xml.find('FromUserName').text
-        msg_type = xml.find('MsgType').text
-        content = xml.find('Content').text if msg_type == 'text' else ''
+        # 从请求体中解构出 ToUserName, FromUserName, MsgType, Content, 和 CreateTime 字段
+        data = request.json
+        #message = process_message(data)
+        ToUserName = data.get('ToUserName', '')
+        FromUserName = data.get('FromUserName', '')
+        MsgType = data.get('MsgType', '')
+        Content = data.get('Content', '')
+        CreateTime = data.get('CreateTime', '')
 
-        if 1:#msg_type == 'text':
+        app.logger.debug('推送接收的账号%s %s', ToUserName, CreateTime)
+
+        if 1:#MsgType == 'text':
             if content == '回复文字':
                 reply_content = '这是回复的消息'
             else:
@@ -111,7 +119,7 @@ def handle_request():
         else:
             reply_content = '暂不支持此类型消息'
 
-        response_xml = generate_reply(from_user, to_user, reply_content)
+        response_xml = generate_reply(FromUserName, ToUserName, reply_content)
         app.logger.debug('回复消息%s', response_xml)
         response = make_response(response_xml)
         
