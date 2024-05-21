@@ -70,8 +70,9 @@ def handle_request():
         app.logger.debug('消息推送%s', request.json)
         
         # 从请求头中获取 'x-wx-from-appid' 字段的值，如果不存在则使用空字符串
-        #app.logger.debug('%s',request.headers)
+        #app.logger.debug('请求头%s',request.headers)
         appid = request.headers.get('X-Wx-Appid', '')#'wx20b1396d77813bab')
+        app.logger.debug('appid%s',appid)
 
         # 从请求体中解构出 ToUserName, FromUserName, MsgType, Content, 和 CreateTime 字段
         data = request.json
@@ -84,8 +85,8 @@ def handle_request():
 
         app.logger.debug('推送接收的账号%s %s', ToUserName, CreateTime)
         
-        if MsgType == 'text':
-            if Content == '回复文字':  # 小程序、公众号可用
+        if 1 :#MsgType == 'text':
+            if 1:#Content == '回复文字':  # 小程序、公众号可用
                 mess = {
                     'touser': FromUserName,
                     'msgtype': 'text',
@@ -96,7 +97,7 @@ def handle_request():
                 try:
                     sendmess(appid, mess)
                 except Exception as e:
-                    app.logger.debug('%s',e)
+                    app.logger.debug('发送错误%s',e)
             return """
     <xml>
     <ToUserName><![CDATA[{target}]]></ToUserName>
