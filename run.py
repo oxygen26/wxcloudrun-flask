@@ -118,7 +118,7 @@ def wechat():
 
             # 处理 XML 数据并生成响应
             response_data = handle_xml_data(xml_data)
-            app.logger.debug('生成的响应数据:%s', response_data.decode('utf-8'))
+            app.logger.debug('生成的响应数据:%s', response_data)
             response = make_response(response_data)
             response.content_type = 'application/xml'
             return response
