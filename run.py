@@ -20,14 +20,13 @@ import sys
 # if __name__ == '__main__':
 #     app.run(host=sys.argv[1], port=sys.argv[2])
 
-from flask import Flask, request, jsonify
 import requests
-import json
+import json,time
 
 from flask import Flask, request, make_response
+
 import hashlib
 import xml.etree.ElementTree as ET
-
 from werobot.replies import process_function_reply
 from werobot.messages.messages import MessageMetaClass, UnknownMessage
 from werobot.messages.events import EventMetaClass, UnknownEvent
@@ -112,7 +111,7 @@ def handle_request():
         app.logger.debug('推送接收的账号%s %s', ToUserName, CreateTime)
 
         if 1:#MsgType == 'text':
-            if content == '回复文字':
+            if Content == '回复文字':
                 reply_content = '这是回复的消息'
             else:
                 reply_content = '收到你的消息：' + content
