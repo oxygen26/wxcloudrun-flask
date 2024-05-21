@@ -7,9 +7,9 @@ import json
 from flask import Flask
 import requests
 robot = WeRoBot(
-    token='xxxxxx',# 对应公众号的token设置
-    encoding_aes_key='xxxxxx',# 明文传输不需要填写
-    app_id='xxxxx'#明文传输不需要填写
+    #token='xxxxxx',# 对应公众号的token设置
+    #encoding_aes_key='xxxxxx',# 明文传输不需要填写
+    app_id='wx20b1396d77813bab'#明文传输不需要填写
 )
 
 import random
