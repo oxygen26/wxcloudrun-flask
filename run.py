@@ -121,7 +121,7 @@ def wechat():
     elif request.content_type == 'application/xml':
         xml_data = request.data
     else:
-        return 'Content-Type 必须为 application/json', 400
+        return 'Content-Type 必须为 不支持', 400
     app.logger.debug('转换后的 XML 数据:%s', xml_data.decode('utf-8'))
 
     # 处理 XML 数据并生成响应
@@ -146,7 +146,10 @@ def json_to_xml(json_data):
                 child = ET.SubElement(parent, "item")
                 build_xml_element(child, item)
         else:
-            parent.text = str(data)
+            if isinstance(data,str):
+                parent.text = f"<![CDATA[{data}]]>"
+            else:
+                parent.text = str(data)
 
     build_xml_element(root, json_data)
     
