@@ -76,11 +76,6 @@ def check_signature(token, signature, timestamp, nonce):
     hashcode = sha1.hexdigest()
     return hashcode == signature
 
-def generate_reply(to_user, from_user, content):
-    # 生成回复消息的 XML 格式
-    TextReply.TEMPLATE.format(to_user, from_user, int(time.time()), content)
-    return reply_xml
-
 def json_to_xml(json_data):
     # 创建 XML 根元素
     root = ET.Element("xml")
@@ -121,7 +116,7 @@ def wechat():
     elif request.content_type == 'application/xml':
         xml_data = request.data
     else:
-        return 'Content-Type 必须为 不支持', 400
+        return 'Content-Type 不支持', 400
     app.logger.debug('转换后的 XML 数据:%s', xml_data.decode('utf-8'))
 
     # 处理 XML 数据并生成响应
@@ -146,10 +141,7 @@ def json_to_xml(json_data):
                 child = ET.SubElement(parent, "item")
                 build_xml_element(child, item)
         else:
-            if isinstance(data,str):
-                parent.text = f"<![CDATA[{data}]]>"
-            else:
-                parent.text = str(data)
+            parent.text = str(data)
 
     build_xml_element(root, json_data)
     
@@ -188,15 +180,7 @@ def handle_xml_data(xml_data):
     return response_xml
 
 def generate_reply(to_user, from_user, content):
-    reply_xml = f"""
-    <xml>
-      <ToUserName><![CDATA[{to_user}]]></ToUserName>
-      <FromUserName><![CDATA[{from_user}]]></FromUserName>
-      <CreateTime>{int(time.time())}</CreateTime>
-      <MsgType><![CDATA[text]]></MsgType>
-      <Content><![CDATA[{content}]]></Content>
-    </xml>
-    """
+    reply_xml = TextReply.TEMPLATE.format(to_user, from_user, int(time.time()), content)
     return reply_xml
 
 if __name__ == '__main__':
