@@ -115,7 +115,7 @@ def handle_request():
         
         import xml.etree.ElementTree as ET
         try:
-            xmls = ET.fromstring(xml_str)
+            xmls = ET.fromstring(json_str)
         except Exception as e:
             #import xml
             import json
