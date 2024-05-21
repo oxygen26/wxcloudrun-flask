@@ -110,11 +110,11 @@ def wechat():
         try:
             # 解析 JSON 数据
             json_data = request.json
-            print('接收到的 JSON 数据:', json_data)
+            app.logger.debug('接收到的 JSON 数据:', json_data)
 
             # 将 JSON 数据转换为 XML
             xml_data = json_to_xml(json_data)
-            print('转换后的 XML 数据:', xml_data.decode('utf-8'))
+            app.logger.debug('转换后的 XML 数据:', xml_data.decode('utf-8'))
 
             # 处理 XML 数据并生成响应
             response_data = handle_xml_data(xml_data)
@@ -160,16 +160,17 @@ def handle_xml_data(xml_data):
         msg_type = xml.find('MsgType').text
         content = xml.find('Content').text if msg_type == 'text' else ''
 
-        print(f'ToUserName: {to_user}')
-        print(f'FromUserName: {from_user}')
-        print(f'MsgType: {msg_type}')
-        print(f'Content: {content}')
+        app.logger.debug(f'ToUserName: {to_user}')
+        app.logger.debug(f'FromUserName: {from_user}')
+        app.logger.debug(f'MsgType: {msg_type}')
+        app.logger.debug(f'Content: {content}')
 
         reply_content = '这是回复的消息' if content == '回复文字' else f'收到你的消息：{content}'
         response_xml = generate_reply(from_user, to_user, reply_content)
         
         return response_xml
-    except ET.ParseError as e:
+    except Exception as e:
+        app.logger.debug('错误! %s',e)
         return f'XML 解析错误: {e}', 400
 
 def generate_reply(to_user, from_user, content):
