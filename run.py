@@ -110,11 +110,11 @@ def wechat():
         try:
             # 解析 JSON 数据
             json_data = request.json
-            app.logger.debug('接收到的 JSON 数据:', json_data)
+            app.logger.debug('接收到的 JSON 数据:%s', json_data)
 
             # 将 JSON 数据转换为 XML
             xml_data = json_to_xml(json_data)
-            app.logger.debug('转换后的 XML 数据:', xml_data.decode('utf-8'))
+            app.logger.debug('转换后的 XML 数据:%s', xml_data.decode('utf-8'))
 
             # 处理 XML 数据并生成响应
             response_data = handle_xml_data(xml_data)
