@@ -31,7 +31,8 @@ app = Flask(__name__)
 def sendmess(appid, mess):
     try:
         response = requests.post(
-            f'http://api.weixin.qq.com/cgi-bin/message/custom/send?from_appid={appid}',
+            f'http://api.weixin.qq.com/cgi-bin/message/custom/send', # ?from_appid={appid}'
+            
             data=json.dumps(mess),
             headers={'Content-Type': 'application/json'}
         )
