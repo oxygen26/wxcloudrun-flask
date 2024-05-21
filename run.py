@@ -36,16 +36,16 @@ def sendmess(appid, mess):
             headers={'Content-Type': 'application/json'}
         )
         response.raise_for_status()
-        app.logger.debug('接口返回内容', response.text)
+        app.logger.debug('接口返回内容%s', response.text)
         return response.text
     except requests.RequestException as e:
-        app.logger.debug('接口返回错误', e)
+        app.logger.debug('接口返回错误%s', e)
         return str(e)
 
 @app.route('/', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def handle_request():
     if request.method == 'POST':
-        app.logger.debug('消息推送', request.json)
+        app.logger.debug('消息推送%s', request.json)
         
         # 从请求头中获取 'x-wx-from-appid' 字段的值，如果不存在则使用空字符串
         appid = request.headers.get('x-wx-from-appid', '')
@@ -58,7 +58,7 @@ def handle_request():
         Content = data.get('Content', '')
         CreateTime = data.get('CreateTime', '')
 
-        app.logger.debug('推送接收的账号', ToUserName, '创建时间', CreateTime)
+        app.logger.debug('推送接收的账号%s %s', ToUserName, CreateTime)
         
         if MsgType == 'text':
             if Content == '回复文字':  # 小程序、公众号可用
