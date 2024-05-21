@@ -92,23 +92,35 @@ def generate_reply(to_user, from_user, content):
 @app.route('/wechat', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def handle_request():
     if request.method == 'POST':
-        app.logger.debug('消息推送%s', request.json)
+        # app.logger.debug('消息推送:%s', request.json)
         
-        # 从请求头中获取 'x-wx-from-appid' 字段的值，如果不存在则使用空字符串
-        #app.logger.debug('请求头%s',request.headers)
-        appid = request.headers.get('X-Wx-Appid', '')#'wx20b1396d77813bab')
-        app.logger.debug('appid%s',appid)
+        # # 从请求头中获取 'x-wx-from-appid' 字段的值，如果不存在则使用空字符串
+        # #app.logger.debug('请求头%s',request.headers)
+        # appid = request.headers.get('X-Wx-Appid', '')#'wx20b1396d77813bab')
+        # app.logger.debug('appid:%s',appid)
 
-        # 从请求体中解构出 ToUserName, FromUserName, MsgType, Content, 和 CreateTime 字段
-        data = request.json
-        #message = process_message(data)
-        ToUserName = data.get('ToUserName', '')
-        FromUserName = data.get('FromUserName', '')
-        MsgType = data.get('MsgType', '')
-        Content = data.get('Content', '')
-        CreateTime = data.get('CreateTime', '')
+        # # 从请求体中解构出 ToUserName, FromUserName, MsgType, Content, 和 CreateTime 字段
+        # data = request.json
+        # #message = process_message(data)
+        # ToUserName = data.get('ToUserName', '')
+        # FromUserName = data.get('FromUserName', '')
+        # MsgType = data.get('MsgType', '')
+        # Content = data.get('Content', '')
+        # CreateTime = data.get('CreateTime', '')
 
-        app.logger.debug('推送接收的账号%s %s', ToUserName, CreateTime)
+        # app.logger.debug('推送接收的账号:%s %s', ToUserName, CreateTime)
+        
+        xml_str = request.data
+        app.logger.debug('Received POST request with data: %s', xml_str)
+        
+        xml = ET.fromstring(xml_str)
+
+        ToUserName = xml.find('ToUserName').text
+        FromUserName = xml.find('FromUserName').text
+        MsgType = xml.find('MsgType').text
+        Content = xml.find('Content').text if MsgType == 'text' else ''
+
+        app.logger.debug('Parsed XML - ToUserName: %s, FromUserName: %s, MsgType: %s, Content: %s', ToUserName, FromUserName, MsgType, Content)
 
         if 1:#MsgType == 'text':
             if Content == '回复文字':
@@ -119,7 +131,7 @@ def handle_request():
             reply_content = '暂不支持此类型消息'
 
         response_xml = generate_reply(FromUserName, ToUserName, reply_content)
-        app.logger.debug('回复消息%s', response_xml)
+        app.logger.debug('回复消息：%s', response_xml)
         response = make_response(response_xml)
         
         response.content_type = 'application/xml'
